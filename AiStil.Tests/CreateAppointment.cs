@@ -22,3 +22,28 @@ public class CreateAppointment
         Assert.Equal(clientId, response.Appointment.ClientId);
     }
 }
+
+internal class CreateAppointmentCommand
+{
+    public CreateAppointmentCommand()
+    {
+    }
+
+    internal AppointmentResponse Execute(DateTime startTime, DateTime endTime, Guid stylistId, Guid clientId)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+internal class AppointmentResponse
+{
+    public Appointment Appointment { get; internal set; }
+}
+
+public class Appointment
+{
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public Guid StylistId { get; set; }
+    public Guid ClientId { get; set; }
+}
