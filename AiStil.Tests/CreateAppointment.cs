@@ -26,12 +26,8 @@ public class CreateAppointment
     }
 }
 
-internal sealed class CreateAppointmentCommand
+internal sealed class CreateAppointmentCommand(CreateAppointmentRequest request)
 {
-    private readonly CreateAppointmentRequest request;
-
-    public CreateAppointmentCommand(CreateAppointmentRequest request) => this.request = request;
-
     internal AppointmentResponse Execute()
     {
         return new AppointmentResponse
