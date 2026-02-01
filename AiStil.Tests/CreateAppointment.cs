@@ -24,6 +24,30 @@ public class CreateAppointment
         Assert.Equal(stylistId, response.Appointment.StylistId);
         Assert.Equal(clientId, response.Appointment.ClientId);
     }
+
+    [Fact]
+    public void CannotCreateAppointmentWhenSlotIsBusy()
+    {
+        // Arrange
+        var startTime = new DateTime(2024, 7, 1, 10, 0, 0);
+        var endTime = startTime.AddHours(1);
+        var stylistId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var clientId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+        var appointmentSlot = new AppointmentSlot(startTime, endTime, stylistId);
+
+        var busySlots = new[]
+        {
+            new AppointmentSlot(startTime.AddMinutes(30), endTime.AddMinutes(30), stylistId)
+        };
+
+        var request = new CreateAppointmentRequest(appointmentSlot, clientId, busySlots);
+
+        // Act
+        var act = () => new CreateAppointmentCommand(request).Execute();
+
+        // Assert
+        Assert.Throws<SlotIsBusyException>(act);
+    }
 }
 
 internal sealed class CreateAppointmentCommand(CreateAppointmentRequest request)
@@ -45,7 +69,13 @@ internal sealed class CreateAppointmentCommand(CreateAppointmentRequest request)
 
 internal sealed record AppointmentSlot(DateTime StartTime, DateTime EndTime, Guid StylistId);
 
-internal sealed record CreateAppointmentRequest(AppointmentSlot Slot, Guid ClientId);
+internal sealed record CreateAppointmentRequest(
+    AppointmentSlot Slot,
+    Guid ClientId,
+    IEnumerable<AppointmentSlot>? BusySlots = null
+);
+
+internal sealed class SlotIsBusyException : Exception;
 
 internal class CreateAppointmentResponse
 {
