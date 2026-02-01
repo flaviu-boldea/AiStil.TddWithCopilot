@@ -6,12 +6,7 @@ public class CreateAppointmentTests
     public void ShouldAcceptWhenSlotIsFree()
     {
         // Arrange
-        var startTime = new DateTime(2024, 7, 1, 10, 0, 0);
-        var endTime = startTime.AddHours(1);
-        var stylistId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-        var clientId = Guid.Parse("22222222-2222-2222-2222-222222222222");
-        var appointmentSlot = new AppointmentSlot(startTime, endTime, stylistId);
-        var request = new CreateAppointmentRequest(appointmentSlot, clientId);
+        var request = CreateRequest();
 
         // Act
         CreateAppointmentResponse response = new CreateAppointmentCommand(request).Execute();
@@ -19,34 +14,41 @@ public class CreateAppointmentTests
         // Assert
         Assert.NotNull(response);
         Assert.NotNull(response.Appointment);
-        Assert.Equal(startTime, response.Appointment.StartTime);
-        Assert.Equal(endTime, response.Appointment.EndTime);
-        Assert.Equal(stylistId, response.Appointment.StylistId);
-        Assert.Equal(clientId, response.Appointment.ClientId);
+        Assert.Equal(request.Slot.StartTime, response.Appointment.StartTime);
+        Assert.Equal(request.Slot.EndTime, response.Appointment.EndTime);
+        Assert.Equal(request.Slot.StylistId, response.Appointment.StylistId);
+        Assert.Equal(request.ClientId, response.Appointment.ClientId);
     }
 
     [Fact]
     public void ShouldRejectWhenSlotIsBusy()
     {
         // Arrange
-        var startTime = new DateTime(2024, 7, 1, 10, 0, 0);
-        var endTime = startTime.AddHours(1);
-        var stylistId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-        var clientId = Guid.Parse("22222222-2222-2222-2222-222222222222");
-        var appointmentSlot = new AppointmentSlot(startTime, endTime, stylistId);
+        var request = CreateRequest();
 
         var busySlots = new[]
         {
-            new AppointmentSlot(startTime.AddMinutes(30), endTime.AddMinutes(30), stylistId)
+            new AppointmentSlot(
+                request.Slot.StartTime.AddMinutes(30),
+                request.Slot.EndTime.AddMinutes(30),
+                request.Slot.StylistId)
         };
-
-        var request = new CreateAppointmentRequest(appointmentSlot, clientId);
 
         // Act
         var act = () => new CreateAppointmentCommand(request, busySlots).Execute();
 
         // Assert
         Assert.Throws<SlotIsBusyException>(act);
+    }
+
+    private static CreateAppointmentRequest CreateRequest()
+    {
+        var startTime = new DateTime(2024, 7, 1, 10, 0, 0);
+        var endTime = startTime.AddHours(1);
+        var stylistId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var clientId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+        var slot = new AppointmentSlot(startTime, endTime, stylistId);
+        return new CreateAppointmentRequest(slot, clientId);
     }
 }
 
