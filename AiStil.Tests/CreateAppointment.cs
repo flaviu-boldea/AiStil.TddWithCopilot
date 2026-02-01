@@ -32,7 +32,16 @@ internal class CreateAppointmentCommand
 
     internal AppointmentResponse Execute(DateTime startTime, DateTime endTime, Guid stylistId, Guid clientId)
     {
-        throw new NotImplementedException();
+        return new AppointmentResponse
+        {
+            Appointment = new Appointment
+            {
+                StartTime = startTime,
+                EndTime = endTime,
+                StylistId = stylistId,
+                ClientId = clientId
+            }
+        };
     }
 }
 
