@@ -3,7 +3,7 @@
 public class CreateAppointmentTests
 {
     [Fact]
-    public void CanCreateAppointment()
+    public void ShouldAcceptWhenSlotIsFree()
     {
         // Arrange
         var startTime = new DateTime(2024, 7, 1, 10, 0, 0);
@@ -26,7 +26,7 @@ public class CreateAppointmentTests
     }
 
     [Fact]
-    public void CannotCreateAppointmentWhenSlotIsBusy()
+    public void ShouldRejectWhenSlotIsBusy()
     {
         // Arrange
         var startTime = new DateTime(2024, 7, 1, 10, 0, 0);
