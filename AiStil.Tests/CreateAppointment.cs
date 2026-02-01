@@ -56,17 +56,9 @@ internal sealed class CreateAppointmentCommand(
 {
     internal CreateAppointmentResponse Execute()
     {
-        busySlots ??= [];
-        foreach (var busySlot in busySlots)
+        if (IsSlotBusy(request.Slot, busySlots ?? []))
         {
-            bool isOverlapping = request.Slot.StartTime < busySlot.EndTime &&
-                                 busySlot.StartTime < request.Slot.EndTime &&
-                                 request.Slot.StylistId == busySlot.StylistId;
-
-            if (isOverlapping)
-            {
-                throw new SlotIsBusyException();
-            }
+            throw new SlotIsBusyException();
         }
         
         return new CreateAppointmentResponse
@@ -80,6 +72,16 @@ internal sealed class CreateAppointmentCommand(
             }
         };
     }
+
+    private static bool IsSlotBusy(AppointmentSlot requestedSlot, IEnumerable<AppointmentSlot> busySlots) =>
+        busySlots.Any(busySlot => IsOverlappingForSameStylist(requestedSlot, busySlot));
+
+    private static bool IsOverlappingForSameStylist(AppointmentSlot requestedSlot, AppointmentSlot busySlot) =>
+        requestedSlot.StylistId == busySlot.StylistId &&
+        Overlaps(requestedSlot.StartTime, requestedSlot.EndTime, busySlot.StartTime, busySlot.EndTime);
+
+    private static bool Overlaps(DateTime startA, DateTime endA, DateTime startB, DateTime endB) =>
+        startA < endB && startB < endA;
 }
 
 internal sealed record AppointmentSlot(DateTime StartTime, DateTime EndTime, Guid StylistId);
