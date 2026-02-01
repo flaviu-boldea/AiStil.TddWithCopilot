@@ -14,7 +14,7 @@ public class CreateAppointment
         var request = new CreateAppointmentRequest(appointmentSlot, clientId);
 
         // Act
-        AppointmentResponse response = new CreateAppointmentCommand(request).Execute();
+        CreateAppointmentResponse response = new CreateAppointmentCommand(request).Execute();
 
         // Assert
         Assert.NotNull(response);
@@ -28,9 +28,9 @@ public class CreateAppointment
 
 internal sealed class CreateAppointmentCommand(CreateAppointmentRequest request)
 {
-    internal AppointmentResponse Execute()
+    internal CreateAppointmentResponse Execute()
     {
-        return new AppointmentResponse
+        return new CreateAppointmentResponse
         {
             Appointment = new Appointment
             {
@@ -47,7 +47,7 @@ internal sealed record AppointmentSlot(DateTime StartTime, DateTime EndTime, Gui
 
 internal sealed record CreateAppointmentRequest(AppointmentSlot Slot, Guid ClientId);
 
-internal class AppointmentResponse
+internal class CreateAppointmentResponse
 {
     public Appointment? Appointment { get; internal set; }
 }
