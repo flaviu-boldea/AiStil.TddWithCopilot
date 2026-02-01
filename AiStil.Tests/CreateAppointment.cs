@@ -13,10 +13,7 @@ public class CreateAppointmentTests
 
         // Assert
         Assert.NotNull(response);
-        Assert.NotNull(response.Appointment);
-        Assert.Equal(request.Slot.StartTime, response.Appointment.StartTime);
-        Assert.Equal(request.Slot.EndTime, response.Appointment.EndTime);
-        Assert.Equal(request.Slot.StylistId, response.Appointment.StylistId);
+        Assert.Equal(request.Slot, response.Appointment.Slot);
         Assert.Equal(request.ClientId, response.Appointment.ClientId);
     }
 
@@ -62,17 +59,12 @@ internal sealed class CreateAppointmentCommand(
         {
             throw new SlotIsBusyException();
         }
-        
-        return new CreateAppointmentResponse
-        {
-            Appointment = new Appointment
-            {
-                StartTime = request.Slot.StartTime,
-                EndTime = request.Slot.EndTime,
-                StylistId = request.Slot.StylistId,
-                ClientId = request.ClientId
-            }
-        };
+
+        var appointment = new Appointment(
+            Slot: request.Slot,
+            ClientId: request.ClientId);
+
+        return new CreateAppointmentResponse(appointment);
     }
 
     private static bool IsSlotBusy(AppointmentSlot requestedSlot, IEnumerable<AppointmentSlot> busySlots) =>
@@ -86,7 +78,7 @@ internal sealed class CreateAppointmentCommand(
         startA < endB && startB < endA;
 }
 
-internal sealed record AppointmentSlot(DateTime StartTime, DateTime EndTime, Guid StylistId);
+public sealed record AppointmentSlot(DateTime StartTime, DateTime EndTime, Guid StylistId);
 
 internal sealed record CreateAppointmentRequest(
     AppointmentSlot Slot,
@@ -95,15 +87,6 @@ internal sealed record CreateAppointmentRequest(
 
 internal sealed class SlotIsBusyException : Exception;
 
-internal class CreateAppointmentResponse
-{
-    public Appointment? Appointment { get; internal set; }
-}
+internal sealed record CreateAppointmentResponse(Appointment Appointment);
 
-public class Appointment
-{
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
-    public Guid StylistId { get; set; }
-    public Guid ClientId { get; set; }
-}
+public sealed record Appointment(AppointmentSlot Slot, Guid ClientId);
