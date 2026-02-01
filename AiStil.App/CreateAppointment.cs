@@ -12,6 +12,8 @@ public sealed class CreateAppointmentCommand(
             throw new SlotIsBusyException();
         }
 
+        busySlotsRepository.SaveBusySlot(request.Slot);
+
         var appointment = new Appointment(
             Slot: request.Slot,
             ClientId: request.ClientId);

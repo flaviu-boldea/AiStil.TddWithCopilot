@@ -22,4 +22,14 @@ public interface ISlotsRepository
     /// <c>requested.StartTime &lt; busy.EndTime</c> and <c>busy.StartTime &lt; requested.EndTime</c>.
     /// </remarks>
     IEnumerable<AppointmentSlot> GetBusySlotsForOverlap(AppointmentSlot requestedSlot);
+
+    /// <summary>
+    /// Persists a newly-created busy slot.
+    /// </summary>
+    /// <param name="slot">The slot to mark as busy.</param>
+    /// <remarks>
+    /// Called only after the use case has determined there is no overlap.
+    /// Implementations should persist the slot in a way that prevents double-booking.
+    /// </remarks>
+    void SaveBusySlot(AppointmentSlot slot);
 }
