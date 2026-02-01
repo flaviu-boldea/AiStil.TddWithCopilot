@@ -2,11 +2,12 @@ namespace AiStil.App;
 
 public sealed class CreateAppointmentCommand(
     CreateAppointmentRequest request,
-    IEnumerable<AppointmentSlot>? busySlots = null)
+    ISlotsRepository busySlotsRepository)
 {
     public CreateAppointmentResponse Execute()
     {
-        if (IsSlotBusy(request.Slot, busySlots ?? []))
+        IEnumerable<AppointmentSlot> busySlots = busySlotsRepository.GetBusySlotsForOverlap(request.Slot);
+        if (IsSlotBusy(request.Slot, busySlots))
         {
             throw new SlotIsBusyException();
         }

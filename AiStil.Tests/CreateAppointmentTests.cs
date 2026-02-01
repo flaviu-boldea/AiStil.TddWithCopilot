@@ -9,9 +9,10 @@ public class CreateAppointmentTests
     {
         // Arrange
         var request = CreateRequest();
+        ISlotsRepository repository = new FakeBusySlotsRepository(_ => Array.Empty<AppointmentSlot>());
 
         // Act
-        CreateAppointmentResponse response = new CreateAppointmentCommand(request).Execute();
+        CreateAppointmentResponse response = new CreateAppointmentCommand(request, repository).Execute();
 
         // Assert
         Assert.NotNull(response);
@@ -33,8 +34,10 @@ public class CreateAppointmentTests
                 request.Slot.StylistId)
         };
 
+        ISlotsRepository repository = new FakeBusySlotsRepository(_ => busySlots);
+
         // Act
-        var act = () => new CreateAppointmentCommand(request, busySlots).Execute();
+        var act = () => new CreateAppointmentCommand(request, repository).Execute();
 
         // Assert
         Assert.Throws<SlotIsBusyException>(act);
@@ -48,5 +51,12 @@ public class CreateAppointmentTests
         var clientId = Guid.Parse("22222222-2222-2222-2222-222222222222");
         var slot = new AppointmentSlot(startTime, endTime, stylistId);
         return new CreateAppointmentRequest(slot, clientId);
+    }
+
+    private sealed class FakeBusySlotsRepository(Func<AppointmentSlot, IEnumerable<AppointmentSlot>> getBusySlots)
+        : ISlotsRepository
+    {
+        public IEnumerable<AppointmentSlot> GetBusySlotsForOverlap(AppointmentSlot requestedSlot) =>
+            getBusySlots(requestedSlot);
     }
 }
