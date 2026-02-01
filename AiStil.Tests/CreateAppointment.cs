@@ -16,6 +16,7 @@ public class CreateAppointment
 
         // Assert
         Assert.NotNull(response);
+        Assert.NotNull(response.Appointment);
         Assert.Equal(startTime, response.Appointment.StartTime);
         Assert.Equal(endTime, response.Appointment.EndTime);
         Assert.Equal(stylistId, response.Appointment.StylistId);
@@ -37,7 +38,7 @@ internal class CreateAppointmentCommand
 
 internal class AppointmentResponse
 {
-    public Appointment Appointment { get; internal set; }
+    public Appointment? Appointment { get; internal set; }
 }
 
 public class Appointment
