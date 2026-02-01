@@ -11,9 +11,10 @@ public class CreateAppointment
         var stylistId = Guid.Parse("11111111-1111-1111-1111-111111111111");
         var clientId = Guid.Parse("22222222-2222-2222-2222-222222222222");
         var appointmentSlot = new AppointmentSlot(startTime, endTime, stylistId);
+        var request = new CreateAppointmentRequest(appointmentSlot, clientId);
 
         // Act
-        AppointmentResponse response = new CreateAppointmentCommand().Execute(appointmentSlot, clientId);
+        AppointmentResponse response = new CreateAppointmentCommand(request).Execute();
 
         // Assert
         Assert.NotNull(response);
@@ -25,28 +26,30 @@ public class CreateAppointment
     }
 }
 
-internal class CreateAppointmentCommand
+internal sealed class CreateAppointmentCommand
 {
-    public CreateAppointmentCommand()
-    {
-    }
+    private readonly CreateAppointmentRequest request;
 
-    internal AppointmentResponse Execute(AppointmentSlot slot, Guid clientId)
+    public CreateAppointmentCommand(CreateAppointmentRequest request) => this.request = request;
+
+    internal AppointmentResponse Execute()
     {
         return new AppointmentResponse
         {
             Appointment = new Appointment
             {
-                StartTime = slot.StartTime,
-                EndTime = slot.EndTime,
-                StylistId = slot.StylistId,
-                ClientId = clientId
+                StartTime = request.Slot.StartTime,
+                EndTime = request.Slot.EndTime,
+                StylistId = request.Slot.StylistId,
+                ClientId = request.ClientId
             }
         };
     }
 }
 
 internal sealed record AppointmentSlot(DateTime StartTime, DateTime EndTime, Guid StylistId);
+
+internal sealed record CreateAppointmentRequest(AppointmentSlot Slot, Guid ClientId);
 
 internal class AppointmentResponse
 {
