@@ -1,6 +1,6 @@
 ﻿namespace AiStil.Tests;
 
-public class CreateAppointment
+public class CreateAppointmentTests
 {
     [Fact]
     public void CanCreateAppointment()
@@ -40,20 +40,35 @@ public class CreateAppointment
             new AppointmentSlot(startTime.AddMinutes(30), endTime.AddMinutes(30), stylistId)
         };
 
-        var request = new CreateAppointmentRequest(appointmentSlot, clientId, busySlots);
+        var request = new CreateAppointmentRequest(appointmentSlot, clientId);
 
         // Act
-        var act = () => new CreateAppointmentCommand(request).Execute();
+        var act = () => new CreateAppointmentCommand(request, busySlots).Execute();
 
         // Assert
         Assert.Throws<SlotIsBusyException>(act);
     }
 }
 
-internal sealed class CreateAppointmentCommand(CreateAppointmentRequest request)
+internal sealed class CreateAppointmentCommand(
+    CreateAppointmentRequest request,
+    IEnumerable<AppointmentSlot>? busySlots = null)
 {
     internal CreateAppointmentResponse Execute()
     {
+        busySlots ??= [];
+        foreach (var busySlot in busySlots)
+        {
+            bool isOverlapping = request.Slot.StartTime < busySlot.EndTime &&
+                                 busySlot.StartTime < request.Slot.EndTime &&
+                                 request.Slot.StylistId == busySlot.StylistId;
+
+            if (isOverlapping)
+            {
+                throw new SlotIsBusyException();
+            }
+        }
+        
         return new CreateAppointmentResponse
         {
             Appointment = new Appointment
@@ -71,8 +86,7 @@ internal sealed record AppointmentSlot(DateTime StartTime, DateTime EndTime, Gui
 
 internal sealed record CreateAppointmentRequest(
     AppointmentSlot Slot,
-    Guid ClientId,
-    IEnumerable<AppointmentSlot>? BusySlots = null
+    Guid ClientId
 );
 
 internal sealed class SlotIsBusyException : Exception;
