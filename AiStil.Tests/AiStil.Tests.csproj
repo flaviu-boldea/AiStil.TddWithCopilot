@@ -19,4 +19,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AiStil.App\AiStil.App.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,6 @@
-﻿namespace AiStil.Tests;
+﻿using AiStil.App;
+
+namespace AiStil.Tests;
 
 public class CreateAppointmentTests
 {
@@ -48,45 +50,3 @@ public class CreateAppointmentTests
         return new CreateAppointmentRequest(slot, clientId);
     }
 }
-
-internal sealed class CreateAppointmentCommand(
-    CreateAppointmentRequest request,
-    IEnumerable<AppointmentSlot>? busySlots = null)
-{
-    internal CreateAppointmentResponse Execute()
-    {
-        if (IsSlotBusy(request.Slot, busySlots ?? []))
-        {
-            throw new SlotIsBusyException();
-        }
-
-        var appointment = new Appointment(
-            Slot: request.Slot,
-            ClientId: request.ClientId);
-
-        return new CreateAppointmentResponse(appointment);
-    }
-
-    private static bool IsSlotBusy(AppointmentSlot requestedSlot, IEnumerable<AppointmentSlot> busySlots) =>
-        busySlots.Any(busySlot => IsOverlappingForSameStylist(requestedSlot, busySlot));
-
-    private static bool IsOverlappingForSameStylist(AppointmentSlot requestedSlot, AppointmentSlot busySlot) =>
-        requestedSlot.StylistId == busySlot.StylistId &&
-        Overlaps(requestedSlot.StartTime, requestedSlot.EndTime, busySlot.StartTime, busySlot.EndTime);
-
-    private static bool Overlaps(DateTime startA, DateTime endA, DateTime startB, DateTime endB) =>
-        startA < endB && startB < endA;
-}
-
-public sealed record AppointmentSlot(DateTime StartTime, DateTime EndTime, Guid StylistId);
-
-internal sealed record CreateAppointmentRequest(
-    AppointmentSlot Slot,
-    Guid ClientId
-);
-
-internal sealed class SlotIsBusyException : Exception;
-
-internal sealed record CreateAppointmentResponse(Appointment Appointment);
-
-public sealed record Appointment(AppointmentSlot Slot, Guid ClientId);
