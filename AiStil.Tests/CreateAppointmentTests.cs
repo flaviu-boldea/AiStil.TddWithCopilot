@@ -9,7 +9,7 @@ public class CreateAppointmentTests
     {
         // Arrange
         var request = CreateRequest();
-        var repository = new FakeBusySlotsRepository(_ => Array.Empty<AppointmentSlot>());
+        var repository = new FakeBusySlotsRepository(_ => Array.Empty<Slot>());
 
         // Act
         CreateAppointmentResponse response = new CreateAppointmentCommand(request, repository).Execute();
@@ -28,7 +28,7 @@ public class CreateAppointmentTests
 
         var busySlots = new[]
         {
-            new AppointmentSlot(
+            new Slot(
                 request.Slot.StartTime.AddMinutes(30),
                 request.Slot.EndTime.AddMinutes(30),
                 request.Slot.StylistId)
@@ -48,7 +48,7 @@ public class CreateAppointmentTests
     {
         // Arrange
         var request = CreateRequest();
-        var repository = new FakeBusySlotsRepository(_ => Array.Empty<AppointmentSlot>());
+        var repository = new FakeBusySlotsRepository(_ => Array.Empty<Slot>());
 
         // Act
         _ = new CreateAppointmentCommand(request, repository).Execute();
@@ -63,7 +63,7 @@ public class CreateAppointmentTests
     {
         // Arrange
         var request = CreateRequest();
-        var repository = new FakeBusySlotsRepository(_ => Array.Empty<AppointmentSlot>());
+        var repository = new FakeBusySlotsRepository(_ => Array.Empty<Slot>());
 
         // Act
         _ = new CreateAppointmentCommand(request, repository).Execute();
@@ -80,20 +80,20 @@ public class CreateAppointmentTests
         var endTime = startTime.AddHours(1);
         var stylistId = Guid.Parse("11111111-1111-1111-1111-111111111111");
         var clientId = Guid.Parse("22222222-2222-2222-2222-222222222222");
-        var slot = new AppointmentSlot(startTime, endTime, stylistId);
+        var slot = new Slot(startTime, endTime, stylistId);
         return new CreateAppointmentRequest(slot, clientId);
     }
 
-    private sealed class FakeBusySlotsRepository(Func<AppointmentSlot, IEnumerable<AppointmentSlot>> getBusySlots)
+    private sealed class FakeBusySlotsRepository(Func<Slot, IEnumerable<Slot>> getBusySlots)
         : ISlotsRepository
     {
-        public List<AppointmentSlot> SavedSlots { get; } = [];
+        public List<Slot> SavedSlots { get; } = [];
         public List<Appointment> SavedAppointments { get; } = [];
 
-        public IEnumerable<AppointmentSlot> GetBusySlotsForOverlap(AppointmentSlot requestedSlot) =>
+        public IEnumerable<Slot> GetBusySlotsForOverlap(Slot requestedSlot) =>
             getBusySlots(requestedSlot);
 
-        public void SaveBusySlot(AppointmentSlot slot) => SavedSlots.Add(slot);
+        public void SaveBusySlot(Slot slot) => SavedSlots.Add(slot);
 
         public void SaveAppointment(Appointment appointment) => SavedAppointments.Add(appointment);
     }

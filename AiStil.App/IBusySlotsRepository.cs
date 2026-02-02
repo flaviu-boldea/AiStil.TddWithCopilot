@@ -21,7 +21,7 @@ public interface ISlotsRepository
     /// Expected overlap rule (half-open interval): two slots overlap if
     /// <c>requested.StartTime &lt; busy.EndTime</c> and <c>busy.StartTime &lt; requested.EndTime</c>.
     /// </remarks>
-    IEnumerable<AppointmentSlot> GetBusySlotsForOverlap(AppointmentSlot requestedSlot);
+    IEnumerable<Slot> GetBusySlotsForOverlap(Slot requestedSlot);
 
     /// <summary>
     /// Persists a newly-created busy slot.
@@ -31,7 +31,7 @@ public interface ISlotsRepository
     /// Called only after the use case has determined there is no overlap.
     /// Implementations should persist the slot in a way that prevents double-booking.
     /// </remarks>
-    void SaveBusySlot(AppointmentSlot slot);
+    void SaveBusySlot(Slot slot);
 
     /// <summary>
     /// Persists a newly created appointment.
