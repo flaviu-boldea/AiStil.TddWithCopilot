@@ -36,6 +36,21 @@ public class CreateAppointmentTests
     }
 
     [Fact]
+    public void ShouldSaveAppointmentWhenAppointmentIsCreated()
+    {
+        // Arrange
+        var request = CreateRequest();
+        var repository = new FakeBusySlotsRepository(_ => Array.Empty<AppointmentSlot>());
+
+        // Act
+        _ = new CreateAppointmentCommand(request, repository).Execute();
+
+        // Assert
+        Assert.Single(repository.SavedAppointments);
+        Assert.Equal(new Appointment(request.Slot, request.ClientId), repository.SavedAppointments[0]);
+    }
+
+    [Fact]
     public void ShouldRejectWhenSlotIsBusy()
     {
         // Arrange
@@ -72,10 +87,13 @@ public class CreateAppointmentTests
         : ISlotsRepository
     {
         public List<AppointmentSlot> SavedSlots { get; } = [];
+        public List<Appointment> SavedAppointments { get; } = [];
 
         public IEnumerable<AppointmentSlot> GetBusySlotsForOverlap(AppointmentSlot requestedSlot) =>
             getBusySlots(requestedSlot);
 
         public void SaveBusySlot(AppointmentSlot slot) => SavedSlots.Add(slot);
+
+        public void SaveAppointment(Appointment appointment) => SavedAppointments.Add(appointment);
     }
 }

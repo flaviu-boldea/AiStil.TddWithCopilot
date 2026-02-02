@@ -18,6 +18,8 @@ public sealed class CreateAppointmentCommand(
             Slot: request.Slot,
             ClientId: request.ClientId);
 
+        busySlotsRepository.SaveAppointment(appointment);
+
         return new CreateAppointmentResponse(appointment);
     }
 

@@ -32,4 +32,15 @@ public interface ISlotsRepository
     /// Implementations should persist the slot in a way that prevents double-booking.
     /// </remarks>
     void SaveBusySlot(AppointmentSlot slot);
+
+    /// <summary>
+    /// Persists a newly created appointment.
+    /// </summary>
+    /// <param name="appointment">The appointment to persist.</param>
+    /// <remarks>
+    /// Implementations should persist the appointment atomically with any related slot/busy-slot changes
+    /// (one transaction/unit of work). Storage-level constraints (indexes/locking) should also prevent
+    /// double-booking under concurrent requests.
+    /// </remarks>
+    void SaveAppointment(Appointment appointment);
 }
