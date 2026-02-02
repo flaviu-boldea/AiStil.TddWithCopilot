@@ -10,28 +10,15 @@ namespace AiStil.App;
 public interface ISlotsRepository
 {
     /// <summary>
-    /// Returns the busy slots that could overlap the <paramref name="requestedSlot"/>.
+    /// Loads the stylist aggregate for booking.
     /// </summary>
     /// <param name="requestedSlot">The slot we want to schedule.</param>
-    /// <returns>
-    /// Busy slots for the same stylist that may overlap the requested slot.
-    /// Implementations should filter by stylist and time window to avoid loading unnecessary data.
-    /// </returns>
+    /// <returns>The stylist with the relevant busy slots preloaded.</returns>
     /// <remarks>
-    /// Expected overlap rule (half-open interval): two slots overlap if
-    /// <c>requested.StartTime &lt; busy.EndTime</c> and <c>busy.StartTime &lt; requested.EndTime</c>.
+    /// Implementations typically query a database and preload only slots that could overlap the
+    /// <paramref name="requestedSlot"/> (same stylist, relevant time window).
     /// </remarks>
-    IEnumerable<Slot> GetBusySlotsForOverlap(Slot requestedSlot);
-
-    /// <summary>
-    /// Persists a newly-created busy slot.
-    /// </summary>
-    /// <param name="slot">The slot to mark as busy.</param>
-    /// <remarks>
-    /// Called only after the use case has determined there is no overlap.
-    /// Implementations should persist the slot in a way that prevents double-booking.
-    /// </remarks>
-    void SaveBusySlot(Slot slot);
+    Stylist LoadStylistForBooking(Slot requestedSlot);
 
     /// <summary>
     /// Persists a newly created appointment.

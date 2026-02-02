@@ -6,12 +6,9 @@ public sealed class CreateAppointmentCommand(
 {
     public CreateAppointmentResponse Execute()
     {
-        IEnumerable<Slot> busySlots = busySlotsRepository.GetBusySlotsForOverlap(request.Slot);
-        var stylist = new Stylist(request.Slot.StylistId, busySlots);
+        Stylist stylist = busySlotsRepository.LoadStylistForBooking(request.Slot);
 
         Appointment appointment = stylist.Book(request.Slot, request.ClientId);
-
-        busySlotsRepository.SaveBusySlot(appointment.Slot);
 
         busySlotsRepository.SaveAppointment(appointment);
 

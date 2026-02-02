@@ -90,11 +90,13 @@ public class CreateAppointmentTests
         public List<Slot> SavedSlots { get; } = [];
         public List<Appointment> SavedAppointments { get; } = [];
 
-        public IEnumerable<Slot> GetBusySlotsForOverlap(Slot requestedSlot) =>
-            getBusySlots(requestedSlot);
+        public Stylist LoadStylistForBooking(Slot requestedSlot) =>
+            new(requestedSlot.StylistId, getBusySlots(requestedSlot));
 
-        public void SaveBusySlot(Slot slot) => SavedSlots.Add(slot);
-
-        public void SaveAppointment(Appointment appointment) => SavedAppointments.Add(appointment);
+        public void SaveAppointment(Appointment appointment)
+        {
+            SavedSlots.Add(appointment.Slot);
+            SavedAppointments.Add(appointment);
+        }
     }
 }
