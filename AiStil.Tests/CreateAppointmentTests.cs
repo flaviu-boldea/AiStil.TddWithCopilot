@@ -21,36 +21,6 @@ public class CreateAppointmentTests
     }
 
     [Fact]
-    public void ShouldSaveBusySlotWhenAppointmentIsCreated()
-    {
-        // Arrange
-        var request = CreateRequest();
-        var repository = new FakeBusySlotsRepository(_ => Array.Empty<AppointmentSlot>());
-
-        // Act
-        _ = new CreateAppointmentCommand(request, repository).Execute();
-
-        // Assert
-        Assert.Single(repository.SavedSlots);
-        Assert.Equal(request.Slot, repository.SavedSlots[0]);
-    }
-
-    [Fact]
-    public void ShouldSaveAppointmentWhenAppointmentIsCreated()
-    {
-        // Arrange
-        var request = CreateRequest();
-        var repository = new FakeBusySlotsRepository(_ => Array.Empty<AppointmentSlot>());
-
-        // Act
-        _ = new CreateAppointmentCommand(request, repository).Execute();
-
-        // Assert
-        Assert.Single(repository.SavedAppointments);
-        Assert.Equal(new Appointment(request.Slot, request.ClientId), repository.SavedAppointments[0]);
-    }
-
-    [Fact]
     public void ShouldRejectWhenSlotIsBusy()
     {
         // Arrange
@@ -72,6 +42,37 @@ public class CreateAppointmentTests
         // Assert
         Assert.Throws<SlotIsBusyException>(act);
     }
+
+    [Fact]
+    public void ShouldBookSlotWhenAppointmentIsCreated()
+    {
+        // Arrange
+        var request = CreateRequest();
+        var repository = new FakeBusySlotsRepository(_ => Array.Empty<AppointmentSlot>());
+
+        // Act
+        _ = new CreateAppointmentCommand(request, repository).Execute();
+
+        // Assert
+        Assert.Single(repository.SavedSlots);
+        Assert.Equal(request.Slot, repository.SavedSlots[0]);
+    }
+
+    [Fact]
+    public void ShouldPersistAppointmentWhenIsCreated()
+    {
+        // Arrange
+        var request = CreateRequest();
+        var repository = new FakeBusySlotsRepository(_ => Array.Empty<AppointmentSlot>());
+
+        // Act
+        _ = new CreateAppointmentCommand(request, repository).Execute();
+
+        // Assert
+        Assert.Single(repository.SavedAppointments);
+        Assert.Equal(new Appointment(request.Slot, request.ClientId), repository.SavedAppointments[0]);
+    }
+
 
     private static CreateAppointmentRequest CreateRequest()
     {
