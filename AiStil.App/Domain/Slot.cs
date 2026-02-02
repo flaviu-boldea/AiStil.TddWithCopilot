@@ -1,4 +1,4 @@
-namespace AiStil.App;
+namespace AiStil.App.Domain;
 
 public sealed record Slot(DateTime StartTime, DateTime EndTime, Guid StylistId)
 {

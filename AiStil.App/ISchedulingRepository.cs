@@ -1,5 +1,7 @@
 namespace AiStil.App;
 
+using AiStil.App.Domain;
+
 /// <summary>
 /// Provides access to busy time slots for a stylist.
 /// </summary>
@@ -7,7 +9,7 @@ namespace AiStil.App;
 /// This is an application-layer abstraction. Implementations typically query a database and return only the
 /// minimum set of slots needed to evaluate overlap for a requested slot (same stylist, relevant time window).
 /// </remarks>
-public interface ISlotsRepository
+public interface ISchedulingRepository
 {
     /// <summary>
     /// Loads the stylist aggregate for booking.

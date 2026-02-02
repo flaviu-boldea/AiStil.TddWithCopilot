@@ -1,4 +1,4 @@
-namespace AiStil.App;
+namespace AiStil.App.Domain;
 
 public sealed class Stylist
 {

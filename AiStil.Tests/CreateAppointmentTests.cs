@@ -1,4 +1,6 @@
 ﻿using AiStil.App;
+using AiStil.App.UseCases;
+using AiStil.App.Domain;
 
 namespace AiStil.Tests;
 
@@ -9,10 +11,10 @@ public class CreateAppointmentTests
     {
         // Arrange
         var request = CreateRequest();
-        var repository = new FakeBusySlotsRepository(_ => Array.Empty<Slot>());
+        var repository = new FakeSchedulingRepository(_ => Array.Empty<Slot>());
 
         // Act
-        CreateAppointmentResponse response = new CreateAppointmentCommand(request, repository).Execute();
+        CreateAppointmentResponse response = new CreateAppointment(request, repository).Execute();
 
         // Assert
         Assert.NotNull(response);
@@ -34,10 +36,10 @@ public class CreateAppointmentTests
                 request.Slot.StylistId)
         };
 
-        ISlotsRepository repository = new FakeBusySlotsRepository(_ => busySlots);
+        ISchedulingRepository repository = new FakeSchedulingRepository(_ => busySlots);
 
         // Act
-        var act = () => new CreateAppointmentCommand(request, repository).Execute();
+        var act = () => new CreateAppointment(request, repository).Execute();
 
         // Assert
         Assert.Throws<SlotIsBusyException>(act);
@@ -48,10 +50,10 @@ public class CreateAppointmentTests
     {
         // Arrange
         var request = CreateRequest();
-        var repository = new FakeBusySlotsRepository(_ => Array.Empty<Slot>());
+        var repository = new FakeSchedulingRepository(_ => Array.Empty<Slot>());
 
         // Act
-        _ = new CreateAppointmentCommand(request, repository).Execute();
+        _ = new CreateAppointment(request, repository).Execute();
 
         // Assert
         Assert.Single(repository.SavedSlots);
@@ -63,10 +65,10 @@ public class CreateAppointmentTests
     {
         // Arrange
         var request = CreateRequest();
-        var repository = new FakeBusySlotsRepository(_ => Array.Empty<Slot>());
+        var repository = new FakeSchedulingRepository(_ => Array.Empty<Slot>());
 
         // Act
-        _ = new CreateAppointmentCommand(request, repository).Execute();
+        _ = new CreateAppointment(request, repository).Execute();
 
         // Assert
         Assert.Single(repository.SavedAppointments);
@@ -84,8 +86,8 @@ public class CreateAppointmentTests
         return new CreateAppointmentRequest(slot, clientId);
     }
 
-    private sealed class FakeBusySlotsRepository(Func<Slot, IEnumerable<Slot>> getBusySlots)
-        : ISlotsRepository
+    private sealed class FakeSchedulingRepository(Func<Slot, IEnumerable<Slot>> getBusySlots)
+        : ISchedulingRepository
     {
         public List<Slot> SavedSlots { get; } = [];
         public List<Appointment> SavedAppointments { get; } = [];

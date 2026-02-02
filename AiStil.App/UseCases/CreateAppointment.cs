@@ -1,16 +1,19 @@
-namespace AiStil.App;
+using AiStil.App;
+using AiStil.App.Domain;
 
-public sealed class CreateAppointmentCommand(
+namespace AiStil.App.UseCases;
+
+public sealed class CreateAppointment(
     CreateAppointmentRequest request,
-    ISlotsRepository busySlotsRepository)
+    ISchedulingRepository repository)
 {
     public CreateAppointmentResponse Execute()
     {
-        Stylist stylist = busySlotsRepository.LoadStylistForBooking(request.Slot);
+        Stylist stylist = repository.LoadStylistForBooking(request.Slot);
 
         Appointment appointment = stylist.Book(request.Slot, request.ClientId);
 
-        busySlotsRepository.SaveAppointment(appointment);
+        repository.SaveAppointment(appointment);
 
         return new CreateAppointmentResponse(appointment);
     }
@@ -22,5 +25,3 @@ public sealed record CreateAppointmentRequest(
 );
 
 public sealed record CreateAppointmentResponse(Appointment Appointment);
-
-public sealed class SlotIsBusyException : Exception;
